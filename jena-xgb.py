@@ -41,29 +41,32 @@ val_temperature, val_raw_data = (
 
 print("Processing training data")
 processed_train_data = np.zeros(
-    (len(train_raw_data) - SEQUENCE_LENGTH, SEQUENCE_LENGTH * train_raw_data.shape[1])
+    (len(train_raw_data) - SEQUENCE_LENGTH * SAMPLING_RATE, SEQUENCE_LENGTH * train_raw_data.shape[1])
 )
 
-for idx in range(len(processed_train_data)):
-    processed_train_data[idx, :] = train_raw_data[
-        idx : idx + SEQUENCE_LENGTH, :
+for idx in range(SEQUENCE_LENGTH * SAMPLING_RATE, len(processed_train_data)):
+    processed_train_data[idx - SEQUENCE_LENGTH * SAMPLING_RATE, :] = train_raw_data[
+        idx - SEQUENCE_LENGTH * SAMPLING_RATE : idx  : SAMPLING_RATE, :
     ].ravel()
 
 print("Processing validation data")
 processed_val_data = np.zeros(
-    (len(val_raw_data) - SEQUENCE_LENGTH, SEQUENCE_LENGTH * val_raw_data.shape[1])
+    (len(val_raw_data) - SEQUENCE_LENGTH * SAMPLING_RATE, SEQUENCE_LENGTH * val_raw_data.shape[1])
 )
-for idx in range(len(processed_val_data)):
-    processed_val_data[idx, :] = val_raw_data[idx : idx + SEQUENCE_LENGTH, :].ravel()
+for idx in range(SEQUENCE_LENGTH * SAMPLING_RATE, len(processed_val_data)):
+    processed_val_data[ idx - SEQUENCE_LENGTH * SAMPLING_RATE, :] = val_raw_data[ idx - SEQUENCE_LENGTH * SAMPLING_RATE : idx : SAMPLING_RATE, :].ravel()
+
 
 
 model = xgb.XGBRegressor()
 
 print("Fitting model")
+print(processed_train_data.shape)
+print(train_temperature.shape)
 
-model.fit(X=processed_train_data, y=train_temperature[SEQUENCE_LENGTH:])
+model.fit(X=processed_train_data, y=train_temperature[SEQUENCE_LENGTH * SAMPLING_RATE:])
 print("Evaluating model")
 y_val = model.predict(processed_val_data)
-print(np.mean(np.abs(y_val - val_temperature[SEQUENCE_LENGTH:])))
+print(np.mean(np.abs(y_val - val_temperature[SEQUENCE_LENGTH * SAMPLING_RATE:])))
 
 # model.
