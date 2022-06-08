@@ -102,7 +102,7 @@ def split_data_keras(
         targets=temperature[delay:],
         sampling_rate=sampling_rate,
         sequence_length=sequence_length,
-        shuffle=True,
+        shuffle=False,
         batch_size=batch_size,
         start_index=num_train_samples,
         end_index=num_train_samples + num_val_samples,
@@ -113,7 +113,7 @@ def split_data_keras(
         targets=temperature[delay:],
         sampling_rate=sampling_rate,
         sequence_length=sequence_length,
-        shuffle=True,
+        shuffle=False,
         batch_size=batch_size,
         start_index=num_train_samples + num_val_samples,
     )
